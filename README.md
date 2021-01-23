@@ -3,7 +3,7 @@
 
 INTRODUCTION
 ------------
-A FLIKA(http://flika-org.github.io/api.html) plugin built from    code orignially developed by Brett Settle (https://github.com/BrettJSettle/SynapseAnalysis) for the Ian Smith Lab (https://faculty.sites.uci.edu/ianfsmithlab/)at University of California, Irvine. 
+A FLIKA(http://flika-org.github.io/api.html) plugin built from    code orignially developed by Brett Settle (https://github.com/BrettJSettle/SynapseAnalysis) for the Ian Smith Lab (https://faculty.sites.uci.edu/ianfsmithlab/) at the University of California, Irvine. 
 
 
 REQUIREMENTS
