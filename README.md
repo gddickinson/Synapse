@@ -110,7 +110,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[License information to be added]
+Released under the [MIT licence](LICENSE). The bundled BioDocks code and `tifffile.py` keep their authors' terms: see [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## Authors
 
