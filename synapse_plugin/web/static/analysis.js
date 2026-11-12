@@ -125,7 +125,8 @@ export function summary(channels, pairs, near, all) {
   channels.forEach((ch, i) => {
     const k = i + 1;
     out[`ch${k}`] = { localisations: ch.n, noise: ch.n_noise, clustered: ch.n_clustered, clusters: ch.n_clusters,
-      unpaired_clusters: ch.n_clusters - pairs.length, locs_per_cluster: describe(pairs.map(p => p[`n${k}`])),
+      // distinct: a channel-2 cluster can be in several pairs
+      unpaired_clusters: ch.n_clusters - new Set(pairs.map(p => p[`cluster${k}`])).size, locs_per_cluster: describe(pairs.map(p => p[`n${k}`])),
       volume: describe(pairs.map(p => p[`volume${k}`])) };
   });
   return out;

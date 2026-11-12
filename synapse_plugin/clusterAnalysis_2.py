@@ -1383,7 +1383,8 @@ class ClusterAnalysis:
             'Channel 2: Number of localizations classified as clusters': len(self.ch2Points)-self.ch2_numNoise,            
                      
             'Channel 1: Number of non-paired clusters': self.ch1_numClusters - (len(self.combined_ch1_Centeroids)),
-            'Channel 2: Number of non-paired clusters': self.ch2_numClusters - (len(self.combined_ch2_Centeroids)),            
+            # distinct channel-2 clusters: one can be the nearest partner of several channel-1 clusters
+            'Channel 2: Number of non-paired clusters': self.ch2_numClusters - len(np.unique(np.asarray(self.combined_ch2_Centeroids).reshape(-1, 3), axis=0)),            
                         
             'Number of nearest neighbor distances': (np.size(self.dist_clusters)),
             'Mean nearest neighbor distance': (np.mean(self.dist_clusters)),

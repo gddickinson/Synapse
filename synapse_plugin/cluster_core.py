@@ -200,8 +200,9 @@ def summary(channels, pairs, near, all_d) -> dict:
     """The deterministic part of saveStats (the random rows are in 'random_stats')."""
     out = {"pairs": len(pairs), "nearest": describe(near), "all": describe(all_d)}
     for k, ch in enumerate(channels, start=1):
+        paired = len({p[f"cluster{k}"] for p in pairs})  # distinct: a channel-2 cluster can be in several pairs
         out[f"ch{k}"] = {"localisations": ch["n"], "noise": ch["n_noise"], "clustered": ch["n_clustered"],
-                         "clusters": ch["n_clusters"], "unpaired_clusters": ch["n_clusters"] - len(pairs),
+                         "clusters": ch["n_clusters"], "unpaired_clusters": ch["n_clusters"] - paired,
                          "locs_per_cluster": describe([p[f"n{k}"] for p in pairs]),
                          "volume": describe([p[f"volume{k}"] for p in pairs])}
     return out

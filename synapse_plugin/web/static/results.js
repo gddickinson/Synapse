@@ -22,7 +22,7 @@ export function statRows(r) {
   [[a, s.ch1, 1], [b, s.ch2, 2]].forEach(([ch, c, k]) => rows.push(
     [`Channel ${k} (${ch.name}): localisations`, c.localisations], [`Channel ${k}: noise`, c.noise],
     [`Channel ${k}: in clusters`, c.clustered], [`Channel ${k}: clusters`, c.clusters],
-    [`Channel ${k}: clusters minus pairs (plugin's "non-paired")`, c.unpaired_clusters]));
+    [`Channel ${k}: clusters not in any pair`, c.unpaired_clusters]));
   const d = (lab, st, f = nm) => rows.push([lab, meanSem(st, f)]);
   d('Nearest-neighbour distance', s.nearest); d('All distances', s.all);
   d('Channel 1: localisations per paired cluster', s.ch1.locs_per_cluster, v => (v === null ? 'n/a' : v.toFixed(2)));

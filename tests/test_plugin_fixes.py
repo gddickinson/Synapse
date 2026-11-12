@@ -90,3 +90,80 @@ def test_channel_order_does_not_depend_on_hash_seed(file):
 def test_fixed_files_still_compile():
     for f in GUI_FILES + ["clusterAnalysis.py", "clusterTest.py", "clusterTest_stepBystep.py", "BioDocks/dbscan.py"]:
         compile((PLUGIN / f).read_text(), f, "exec")
+
+
+# --- second round of fixes ------------------------------------------------------------------------------------------
+def _save_stats_self(tmp_path, n_ch2_clusters):
+    """Fake ClusterAnalysis state: 3 channel-1 clusters, two of them paired with the same channel-2 cluster."""
+    import types
+    c2 = np.array([[0.0, 0, 0], [0.0, 0, 0], [500.0, 0, 0]])  # channel-2 centroids of the 3 pairs (2 distinct)
+    d = np.array([10.0, 20.0, 30.0])
+    return types.SimpleNamespace(
+        eps=100, min_samples=10, maxDistance=100, combined_ch1_Centeroids=c2 + 1, combined_ch2_Centeroids=c2,
+        ch1Points=np.zeros((50, 2)), ch2Points=np.zeros((40, 2)), ch1_numNoise=5, ch2_numNoise=4,
+        ch1_numClusters=3, ch2_numClusters=n_ch2_clusters, dist_clusters=d, distAll_clusters=d, dist_random=d,
+        distAll_random=d, ch1_random=c2, ch2_random=c2,
+        getClusterLocalizations=lambda ch: d, getClusterVolumes=lambda ch: d, displayMessage=lambda *a, **k: None)
+
+
+def test_non_paired_channel2_clusters_counts_distinct_clusters(tmp_path):
+    """saveStats reported channel-2 non-paired clusters as clusters minus pairs, which undercounts (even goes negative)
+    when one channel-2 cluster is the nearest partner of several channel-1 clusters."""
+    import pandas as pd
+    from scipy import stats
+    fn = load_function("clusterAnalysis_2.py", "saveStats", {"np": np, "pd": pd, "stats": stats, "os": os},
+                       cls="ClusterAnalysis")
+    fn(_save_stats_self(tmp_path, 2), savePath=str(tmp_path), fileName="t")
+    row = pd.read_csv(tmp_path / "t_stats.csv").iloc[0]
+    assert row["Channel 1: Number of non-paired clusters"] == 0
+    assert row["Channel 2: Number of non-paired clusters"] == 0  # both channel-2 clusters are paired (was -1)
+
+
+def test_core_counts_distinct_unpaired_channel2_clusters():
+    from synapse_plugin.cluster_core import summary
+    ch = [{"n": 10, "n_noise": 0, "n_clustered": 10, "n_clusters": 3}, {"n": 10, "n_noise": 0, "n_clustered": 10, "n_clusters": 2}]
+    pairs = [{"cluster1": i, "cluster2": j, "n1": 4, "n2": 4, "volume1": 1.0, "volume2": 1.0} for i, j in ((0, 0), (1, 0), (2, 1))]
+    s = summary(ch, pairs, np.ones(3), np.ones(9))
+    assert (s["ch1"]["unpaired_clusters"], s["ch2"]["unpaired_clusters"]) == (0, 0)
+
+
+def test_plugin_does_not_need_distutils():
+    """The plugin imported distutils.version.StrictVersion, and distutils was removed in Python 3.12."""
+    for f in sorted(PLUGIN.glob("*.py")):
+        assert "from distutils" not in f.read_text(), f.name
+    vc = load_module("version_compat.py", "version_compat")
+    assert vc.StrictVersion("0.2.9") < vc.StrictVersion("0.2.23") <= vc.StrictVersion("0.2.23")
+    assert vc.StrictVersion("1.0") > vc.StrictVersion("0.2.23")
+
+
+@pytest.mark.parametrize("file", GUI_FILES)
+def test_get_hulls_with_a_flat_cluster(file):
+    """In 3D mode getHulls called ConvexHull on every cluster, which raises QhullError for a flat cluster (e.g. all Zc
+    equal), stopping the analysis. A flat cluster now gets the 2D hull of its x, y footprint (as triangles)."""
+    from synapse_plugin.cluster_core import hull_simplices
+    cls = "ClusterAnalysis" if file == "clusterAnalysis_2.py" else "Synapse3D"
+    fn = load_function(file, "getHulls", {"np": np, "ConvexHull": ConvexHull, "hull_simplices": hull_simplices}, cls=cls)
+    rng = np.random.default_rng(5)
+    flat = np.c_[rng.normal(0, 30, (15, 2)), np.full(15, 40.0)]
+    pts = np.r_[flat, rng.normal(1000, 30, (12, 3))]
+    labels = np.r_[np.zeros(15, int), np.ones(12, int)]
+    hulls, centroids, groups = fn(None, pts, labels)
+    assert len(hulls) == 2 and hulls[0].shape[1] == 3 and len(hulls[0]) > 0
+    assert np.concatenate((hulls[0], hulls[1])).shape[1] == 3  # combineClosestHulls concatenates them
+
+
+def test_core_flags_flat_clusters():
+    from synapse_plugin.cluster_core import roi_stats
+    rng = np.random.default_rng(6)
+    flat = np.c_[rng.normal(0, 30, (10, 2)), np.zeros(10)]
+    s = roi_stats(flat, rng.normal(0, 30, (10, 3)))
+    assert s["volume1"] == 0 and s["flat1"] and not s["flat2"]
+
+
+def test_no_compiled_python_tracked():
+    """43 stale .pyc files (Python 3.6/3.7) were committed; they are now untracked and ignored."""
+    r = subprocess.run(["git", "ls-files", "*.pyc"], cwd=PLUGIN.parent, capture_output=True, text=True)
+    if r.returncode:
+        pytest.skip("not a git checkout")
+    assert r.stdout.strip() == ""
+    assert "*.pyc" in (PLUGIN.parent / ".gitignore").read_text()
