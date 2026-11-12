@@ -1,9 +1,6 @@
 import numpy as np
 
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
-from sklearn.preprocessing import StandardScaler
 
 def dbscan(xyData, eps=500, min_samples = 10, plot=False):
     '''
@@ -56,7 +53,7 @@ def dbscan(xyData, eps=500, min_samples = 10, plot=False):
     
     #convert cluster labels with low numbers of points to noise (-1)
     if bool(filterDict): 
-        labels = [-1 if x in labelsToFilter else x for x in labels]
+        labels = np.array([-1 if x in labelsToFilter else x for x in labels])  # keep an array: callers use labels == i
     
     #recount clusters
     unique, counts = np.unique(labels, return_counts=True)
