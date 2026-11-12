@@ -64,3 +64,12 @@ for (const s of fx.simulations) {
 assert.throws(() => parseTable('Channel Name\tXc\tYc\tZc\nA\t1\t2\t3\n'), /two channels/);
 assert.throws(() => parseTable('Chan\tX\tY\n1\t2\t3\n'), /required/);
 console.log(`all engine checks passed (${checks} numbers compared)`);
+
+// flat (coplanar) clusters: volume 0 and flagged, as cluster_core.roi_stats
+{
+  const { roiStats } = await import('./analysis.js');
+  const flat = Array.from({ length: 8 }, (_, i) => [Math.cos(i), Math.sin(i * 1.7), 5]);
+  const s = roiStats(flat, [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+  assert.equal(s.volume1, 0); assert.equal(s.flat1, true); assert.equal(s.flat2, false);
+  console.log('ok  flat clusters flagged');
+}

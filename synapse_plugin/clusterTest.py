@@ -12,6 +12,10 @@ except:
     from .BioDocks import *
 from pyqtgraph.dockarea import *
 from scipy.spatial import ConvexHull
+try:
+    from .cluster_core import hull_simplices  # flat clusters get a 2D hull instead of a QhullError
+except ImportError:
+    from cluster_core import hull_simplices
 from collections import OrderedDict
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from qtpy import QtWidgets, QtCore, QtGui
@@ -239,7 +243,7 @@ class ClusterAnalysis:
         for i in range(n_clusters):
             clusterPoints = points[labels==i]
             groupPoints.append(clusterPoints)           
-            hulls.append(ConvexHull(clusterPoints).simplices)
+            hulls.append(hull_simplices(clusterPoints))
             centeroids.append(np.average(clusterPoints,axis=0)) 
         return hulls, np.array(centeroids), groupPoints  # lists: clusters differ in size (ragged)
 
@@ -247,7 +251,7 @@ class ClusterAnalysis:
     def getHulls2(self,pointList):
         hullList = []
         for points in pointList:
-            hullList.append(ConvexHull(points).simplices)
+            hullList.append(hull_simplices(points))
         return hullList
 
 

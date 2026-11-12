@@ -40,7 +40,7 @@ export function statsTable(r) {
 }
 
 const PAIR_COLS = [['ROI #', p => p.roi], ['Mean distance (nm)', p => nm(p.distance)], ['N ch1', p => p.n1], ['N ch2', p => p.n2],
-  ['Volume ch1', p => nm3(p.volume1)], ['Volume ch2', p => nm3(p.volume2)],
+  ['Volume ch1', p => nm3(p.volume1) + (p.flat1 ? ' (flat)' : '')], ['Volume ch2', p => nm3(p.volume2) + (p.flat2 ? ' (flat)' : '')],
   ['Extent x × y × z (nm)', p => `${Math.round(p.height)} × ${Math.round(p.width)} × ${Math.round(p.depth)}`]];
 
 export function pairsTable(r, page = 0, per = 25, sel = -1) {
@@ -68,8 +68,8 @@ export function pairsCsv(r) {
   const [a, b] = r.channels.map(c => c.name);
   return csv([['ROI #', 'Mean Distance (nm)', `${a} N`, `${b} N`, `${a} Volume (nm^3)`, `${b} Volume (nm^3)`,
     `${a} Centroid x (nm)`, `${a} Centroid y (nm)`, `${a} Centroid z (nm)`, `${b} Centroid x (nm)`, `${b} Centroid y (nm)`, `${b} Centroid z (nm)`,
-    'height (x extent, nm)', 'width (y extent, nm)', 'depth (z extent, nm)', 'box volume (nm^3)'],
-  ...r.pairs.map(p => [p.roi, p.distance, p.n1, p.n2, p.volume1, p.volume2, ...p.centroid1, ...p.centroid2, p.height, p.width, p.depth, p.box_volume])]);
+    'height (x extent, nm)', 'width (y extent, nm)', 'depth (z extent, nm)', 'box volume (nm^3)', `${a} flat`, `${b} flat`],
+  ...r.pairs.map(p => [p.roi, p.distance, p.n1, p.n2, p.volume1, p.volume2, ...p.centroid1, ...p.centroid2, p.height, p.width, p.depth, p.box_volume, p.flat1, p.flat2])]);
 }
 export const statsCsv = r => csv([['quantity', 'value'], ...statRows(r)]);
 // every analysed localisation with its channel and DBSCAN label (-1 = noise)

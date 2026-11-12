@@ -68,8 +68,12 @@ def build() -> dict:
     p = dict(eps=100, min_samples=4, max_distance=100, unit="nm")
     cases.append({"name": "border points claimed by earlier clusters", "text": "border", "params": p,
                   "result": strip(analyse(parse_table(bt), **p))})
+    flat = simulate(seed=4, n_pairs=6, n_single=2, noise=60, z_rejected=0, sigma_z=0, depth_nm=0)["text"]
+    p = dict(eps=100, min_samples=10, max_distance=100, unit="nm")
+    cases.append({"name": "2D table (all Zc equal): flat clusters", "text": "flat", "params": p,
+                  "result": strip(analyse(parse_table(flat), **p))})
     sims = [{"params": SIM, "text": "sim"}]
-    return {"texts": {"sim": sim_text, "border": bt}, "cases": cases, "volumes": volume_cases(), "simulations": sims}
+    return {"texts": {"sim": sim_text, "border": bt, "flat": flat}, "cases": cases, "volumes": volume_cases(), "simulations": sims}
 
 
 def main():

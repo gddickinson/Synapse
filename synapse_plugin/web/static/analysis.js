@@ -20,9 +20,13 @@ export function clustersOf(pts, labels) {
   }
   return [...groups.keys()].sort((a, b) => a - b).map(label => {
     const p = groups.get(label);
-    return { label, n: p.length, centroid: mean3(p), volume: convexVolume(p), points: p };
+    const volume = convexVolume(p);
+    return { label, n: p.length, centroid: mean3(p), volume, flat: isFlat(p, volume), points: p };
   });
 }
+
+// a cluster of at least 4 points whose convex hull has no volume (coplanar): volume reported as 0, flagged
+export const isFlat = (p, volume) => p.length >= 4 && volume === 0;
 
 export function mean3(p) {
   const m = [0, 0, 0];
@@ -46,7 +50,8 @@ export function roiStats(p1, p2) {
   const a = mean3(p1), b = mean3(p2), lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
   for (const q of [...p1, ...p2]) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], q[k]); hi[k] = Math.max(hi[k], q[k]); }
   const e = hi.map((h, k) => h - lo[k]);
-  return { n1: p1.length, n2: p2.length, volume1: convexVolume(p1), volume2: convexVolume(p2), distance: dist(a, b),
+  const v1 = convexVolume(p1), v2 = convexVolume(p2);
+  return { n1: p1.length, n2: p2.length, volume1: v1, volume2: v2, flat1: isFlat(p1, v1), flat2: isFlat(p2, v2), distance: dist(a, b),
     centroid1: a, centroid2: b, center: a.map((v, k) => (v + b[k]) / 2), height: e[0], width: e[1], depth: e[2],
     box_volume: e[0] * e[1] * e[2] };
 }

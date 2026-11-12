@@ -57,7 +57,8 @@ def test_get_hulls_with_clusters_of_different_sizes(file):
     """getHulls built np.array() from ragged lists, which numpy >= 1.24 refuses (ValueError) whenever two clusters
     have different sizes, i.e. on almost every real data set."""
     cls = "ClusterAnalysis" if file == "clusterAnalysis_2.py" else "Synapse3D"
-    fn = load_function(file, "getHulls", {"np": np, "ConvexHull": ConvexHull}, cls=cls)
+    from synapse_plugin.cluster_core import hull_simplices
+    fn = load_function(file, "getHulls", {"np": np, "ConvexHull": ConvexHull, "hull_simplices": hull_simplices}, cls=cls)
     rng = np.random.default_rng(1)
     pts = np.r_[rng.normal(0, 30, (12, 3)), rng.normal(1000, 30, (20, 3)), rng.uniform(-5000, 5000, (5, 3))]
     labels = np.r_[np.zeros(12, int), np.ones(20, int), -np.ones(5, int)]

@@ -110,7 +110,7 @@ function show() {
     <h2>Statistics</h2>${statsTable(r)}
     <h2>Paired clusters (ROIs)</h2>
     <p class="small mute">Each <span class="c1">${esc(a.name)}</span> cluster is paired with the nearest <span class="c2">${esc(b.name)}</span>
-      cluster whose centroid is within ${r.params.max_distance} nm. Volumes are convex hulls (0 below 4 points or for a flat cluster).</p>
+      cluster whose centroid is within ${r.params.max_distance} nm. Volumes are convex hulls: 0 below 4 points, and 0 marked "(flat)" for coplanar points.</p>
     <div id="pairs">${pairsTable(r, view.page, 25, view.sel)}</div>
     <h2>Distances</h2>${charts(r)}
     <h2>Export</h2>

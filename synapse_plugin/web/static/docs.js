@@ -18,8 +18,8 @@ route('method', async () => {
       Defaults: eps = ${d.eps} nm, min_samples = ${d.min_samples}.</li>
     <li><b>Centroids and pairing</b> (<code>getHulls</code>, <code>combineClosestHulls</code>). Each channel-1 cluster is paired with the channel-2 cluster whose
       centroid is nearest, if that distance is at most the <i>max distance between clusters</i> (default ${d.max_distance} nm). A channel-2 cluster can be paired more than once.</li>
-    <li><b>Per pair (ROI)</b> (<code>analyze_roi</code>): localisations per channel, convex-hull volume per channel (0 with fewer than 4 points or for a flat
-      cluster), the distance between the two centroids ("Mean Distance"), and the x, y, z extents of both clusters together (the plugin calls them height, width, depth).</li>
+    <li><b>Per pair (ROI)</b> (<code>analyze_roi</code>): localisations per channel, convex-hull volume per channel (0 with fewer than 4 points; 0 and flagged
+      "flat" when the points are coplanar, e.g. 2D data with one Zc, where the plugin now draws the x, y footprint instead of stopping), the distance between the two centroids ("Mean Distance"), and the x, y, z extents of both clusters together (the plugin calls them height, width, depth).</li>
     <li><b>Distances against a random control</b> (<code>randomPointAnalysis</code>): from each channel-2 paired centroid, the distance to the nearest channel-1
       paired centroid, and to all of them. The same is done for as many uniformly random points in the data's bounding box. Summaries: mean, SEM (n−1), SD (n).</li>
   </ol>

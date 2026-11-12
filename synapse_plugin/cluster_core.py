@@ -89,13 +89,38 @@ def convex_volume(points) -> float:
         return 0.0
 
 
+def hull_simplices(points) -> np.ndarray:
+    """Convex-hull simplices for the plugin's getHulls / getHulls2. A flat 3D cluster (Qhull refuses it) gets the 2D
+    hull of its x, y footprint as a fan of triangles (indices into `points`, 3 columns so hulls can be concatenated);
+    a collinear or tiny cluster gets an empty (0, d) array instead of stopping the analysis."""
+    points = np.asarray(points, float)
+    d = points.shape[1] if points.ndim == 2 else 3
+    try:
+        return ConvexHull(points).simplices
+    except (QhullError, ValueError):
+        pass
+    if d == 3:
+        try:
+            v = ConvexHull(points[:, :2]).vertices
+            return np.array([[v[0], v[i], v[i + 1]] for i in range(1, len(v) - 1)], int).reshape(-1, 3)
+        except (QhullError, ValueError):
+            pass
+    return np.zeros((0, d), int)
+
+
+def is_flat(points, volume: float) -> bool:
+    """True for a cluster with at least 4 points whose convex hull has no volume (coplanar points)."""
+    return len(points) >= 4 and volume == 0.0
+
+
 def clusters_of(points, labels) -> list:
     """Clusters in ascending label order: {'label', 'n', 'centroid', 'volume'} (+ 'points' for internal use)."""
     out = []
     for lab in np.unique(labels[labels >= 0]):
         p = points[labels == lab]
-        out.append({"label": int(lab), "n": len(p), "centroid": p.mean(axis=0), "volume": convex_volume(p),
-                    "points": p})
+        vol = convex_volume(p)
+        out.append({"label": int(lab), "n": len(p), "centroid": p.mean(axis=0), "volume": vol,
+                    "flat": is_flat(p, vol), "points": p})
     return out
 
 
@@ -114,12 +139,14 @@ def pair_clusters(c1: list, c2: list, max_distance: float) -> list:
 
 
 def roi_stats(p1, p2) -> dict:
-    """analyze_roi for one pair: counts, volumes, centroid distance, centroids, extents (x = 'height', y = 'width',
-    z = 'depth', as the plugin names them) and their product."""
+    """analyze_roi for one pair: counts, volumes (flat1/flat2 flag a flat cluster, volume 0), centroid distance,
+    centroids, extents (x = 'height', y = 'width', z = 'depth', as the plugin names them) and their product."""
     a, b = p1.mean(axis=0), p2.mean(axis=0)
     both = np.r_[p1, p2]
     ext = both.max(axis=0) - both.min(axis=0)
-    return {"n1": len(p1), "n2": len(p2), "volume1": convex_volume(p1), "volume2": convex_volume(p2),
+    v1, v2 = convex_volume(p1), convex_volume(p2)
+    return {"n1": len(p1), "n2": len(p2), "volume1": v1, "volume2": v2, "flat1": is_flat(p1, v1),
+            "flat2": is_flat(p2, v2),
             "distance": float(np.linalg.norm(a - b)), "centroid1": a.tolist(), "centroid2": b.tolist(),
             "center": ((a + b) / 2).tolist(), "height": float(ext[0]), "width": float(ext[1]),
             "depth": float(ext[2]), "box_volume": float(ext[0] * ext[1] * ext[2])}
