@@ -4,7 +4,10 @@ import sys
 from scipy.spatial import ConvexHull
 from collections import OrderedDict
 from qtpy import QtWidgets, QtCore, QtGui
-from distutils.version import StrictVersion
+try:
+    from .version_compat import StrictVersion  # distutils was removed in Python 3.12
+except ImportError:
+    from version_compat import StrictVersion
 import numpy
 import tifffile
 import xlrd
@@ -20,7 +23,10 @@ from scipy.spatial import Delaunay
 import pyqtgraph.console
 from pyqtgraph.dockarea import *
 from collections import OrderedDict
-from distutils.version import StrictVersion
+try:
+    from .version_compat import StrictVersion  # distutils was removed in Python 3.12
+except ImportError:
+    from version_compat import StrictVersion
 import struct
 from collections import defaultdict
 from types import FunctionType

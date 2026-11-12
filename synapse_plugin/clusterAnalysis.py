@@ -21,7 +21,10 @@ from qtpy.QtCore import *
 import flika
 from flika import global_vars as g
 from flika.window import Window
-from distutils.version import StrictVersion
+try:
+    from .version_compat import StrictVersion  # distutils was removed in Python 3.12
+except ImportError:
+    from version_compat import StrictVersion
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import mkPen

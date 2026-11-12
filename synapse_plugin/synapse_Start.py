@@ -10,7 +10,10 @@ import pyqtgraph as pg
 #import os
 #from os import listdir
 #from os.path import expanduser, isfile, join
-from distutils.version import StrictVersion
+try:
+    from .version_compat import StrictVersion  # distutils was removed in Python 3.12
+except ImportError:
+    from version_compat import StrictVersion
 
 #import pyqtgraph.opengl as gl
 #from OpenGL.GL import *
