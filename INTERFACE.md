@@ -8,7 +8,8 @@
 | `Synapse3D.py`, `Synapse.py`, `clusterAnalysis.py` | Earlier versions (not in the menu). |
 | `clusterTest.py`, `clusterTest_stepBystep.py`, `*_example.py`, `*Test*.py`, `test_NearestNeighbour` | Development scripts. |
 | `BioDocks/` | Brett Settle's BioDocks library (third-party terms, see THIRD_PARTY.md): `dbscan.py` (sklearn DBSCAN + undersized-cluster filter), `ClusterMath.py` (`convex_volume`), `Tools.py` (`combineClosestHulls`, `order_points`), `Channels.py`, `ROIs.py`, `AnalysisIO.py` (`importFile`), widgets. Package `__init__` imports Qt. |
-| `cluster_core.py` | Qt-free Version 2 pipeline: `DEFAULTS`, `UNITS`, `parse_table`, `dbscan_labels`, `convex_volume`, `clusters_of`, `pair_clusters`, `roi_stats`, `nn_distances`, `random_box_points`, `describe`, `analyse`, `summary`, `clean`. numpy/scipy/sklearn. Used by the web app; tested against the plugin's functions. |
+| `cluster_core.py` | Qt-free Version 2 pipeline: `DEFAULTS`, `UNITS`, `parse_table`, `dbscan_labels`, `convex_volume`, `hull_simplices` (also used by the plugin's getHulls: 2D fallback for flat clusters), `is_flat`, `clusters_of`, `pair_clusters`, `roi_stats`, `nn_distances`, `random_box_points`, `describe`, `analyse`, `summary`, `clean`. numpy/scipy/sklearn. Used by the web app; tested against the plugin's functions. |
+| `version_compat.py` | `StrictVersion` replacement (distutils is gone in Python 3.12); used by every plugin module. |
 | `simulate.py` | Synthetic labelled two-channel tables: `DEFAULTS`, `NAMES`, `mulberry32` (same stream as core.js `rng`), `simulate`. |
 | `user-guide.md`, `batch.yaml`, `_roiAnalysis.csv` | User guide, batch parameter example, example ROI output. |
 
@@ -32,7 +33,7 @@
 | `table.js` | `parseTable`, `UNITS`, `NM_PER_PIXEL`, `IGNORE`. |
 | `dbscan.js` | `dbscan`, `neighbourhoods` (grid) matching sklearn + plugin filter. |
 | `hull.js` | `convexVolume` (incremental 3D hull). |
-| `analysis.js` | `analyse` (port of cluster_core.analyse), `pairClusters`, `roiStats`, `nnDistances`, `describe`, `summary`. |
+| `analysis.js` | `analyse` (port of cluster_core.analyse), `isFlat`, `pairClusters`, `roiStats`, `nnDistances`, `describe`, `summary`. |
 | `simulate.js` | Port of simulate.py. |
 | `engine.test.mjs` | Node test of the above against the fixture. |
 | `viewer3d.js` | Raw WebGL point-cloud viewer (`createViewer`: set, options, focus). |

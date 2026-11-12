@@ -14,6 +14,14 @@
   analyze_roi and getNearestNeighbors.
 - Web app (FastAPI, port 8111) + static GitHub Pages site: Analyse (in-browser JS port, WebGL 3D viewer, stats, pairs,
   histograms, CSV), Simulate, Method, About. Node test: identical DBSCAN labels, numbers to 1e-9 vs Python.
-- Not changed (noted for George): the plugin still needs Python < 3.12 (`distutils.StrictVersion`); `saveStats`
-  "Channel 2 non-paired clusters" is clusters minus pairs, which is wrong when one channel-2 cluster is paired twice;
-  43 `.pyc` files are tracked in git.
+- Not changed at first (noted for George), then fixed on the coordinator's instruction (see next entry).
+
+## 2026-11-12: second round of fixes (after the merge to main)
+- Fix: saveStats "Channel 2: non-paired clusters" now subtracts the distinct paired channel-2 clusters (was clusters
+  minus pairs, wrong when one channel-2 cluster is in several pairs); cluster_core and the web match.
+- Fix: `distutils.version.StrictVersion` replaced by `synapse_plugin/version_compat.py` in all plugin modules (Python 3.12+).
+- Fix: flat 3D clusters no longer stop getHulls/getHulls2 (`cluster_core.hull_simplices`: 2D footprint hull, or empty);
+  volume stays 0 and is flagged "flat" in cluster_core, the web table and CSV; new 2D-table fixture case.
+- Fix: the 43 tracked .pyc files are untracked; .gitignore covers __pycache__/ and *.pyc.
+- The plugin itself could not be launched here (flika is not installed in the shared venv); its changed functions are
+  tested from source via tests/gui_source.py and every module compiles.
