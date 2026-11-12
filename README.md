@@ -103,6 +103,38 @@ The plugin provides several key interface elements:
 - **Ctrl+G**: Show titles
 - **Ctrl+H**: Hide titles
 
+## Web interface
+
+Synapse3D also runs in the browser: **https://gddickinson.github.io/Synapse/** (static site, published from `main`).
+
+- **Analyse**: load your own localisation table (`Channel Name`/`Channel`, `Xc`, `Yc`, `Zc`; tab or comma separated; nm, µm
+  or 166 nm camera pixels) or the demo table, set eps, min points and the max distance between clusters, and get the
+  plugin's results: clusters per channel, paired clusters with counts, convex-hull volumes and centroid distances (nm),
+  the nearest-neighbour and all-distance statistics against a random control, a WebGL 3D point-cloud viewer and CSV
+  exports. The analysis runs in your browser; files are not uploaded.
+- **Simulate**: generate a labelled synthetic two-channel table (known pairs, background, "Z Rejected" rows) to try
+  parameters on. The repo has no measured localisation data, so the demo table is synthetic too.
+- **Method** and **About**: the pipeline step by step, and credits.
+
+The browser code (`synapse_plugin/web/static/analysis.js`, `dbscan.js`, `hull.js`) is a port of
+`synapse_plugin/cluster_core.py` (the Qt-free version of the Version 2 pipeline, using scikit-learn and scipy); a node
+test requires identical DBSCAN labels and the same numbers to 1e-9 relative, and pytest checks `cluster_core.py`
+against the plugin's own functions.
+
+### Run the web app
+
+```bash
+pip install -r requirements-web.txt
+python run_web.py            # http://127.0.0.1:8111
+python -m pytest -q tests    # Python tests (includes the node engine test if node is installed)
+```
+
+The local app adds a "Check against the Python analysis" button for any file.
+
+![Home](docs/img/home.png)
+![Analyse](docs/img/analyse.png)
+![Simulate](docs/img/simulate.png)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
