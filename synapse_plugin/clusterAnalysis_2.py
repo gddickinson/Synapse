@@ -1295,7 +1295,7 @@ class ClusterAnalysis:
     def getRandomXYZ(self, minX, minY, minZ, maxX, maxY, maxZ, n):
         randomList = []
         while len(randomList) < n:
-            p = np.array([random.uniform(minX,maxY),
+            p = np.array([random.uniform(minX,maxX),
                  random.uniform(minY,maxY),
                  random.uniform(minZ,maxZ)])
             randomList.append(p)       
