@@ -247,7 +247,7 @@ class ClusterAnalysis:
             groupPoints.append(clusterPoints)           
             hulls.append(ConvexHull(clusterPoints).simplices)
             centeroids.append(np.average(clusterPoints,axis=0)) 
-        return np.array(hulls), np.array(centeroids), np.array(groupPoints)
+        return hulls, np.array(centeroids), groupPoints  # lists: clusters differ in size (ragged)
 
 
     def getHulls2(self,pointList):
