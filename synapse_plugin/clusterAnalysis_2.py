@@ -214,7 +214,7 @@ class ClusterAnalysis:
                 self.data[k] = self.data[k].astype(float)
         self.displayMessage('Gathering channels...')
                             
-        self.names = set(self.data['Channel Name'].astype(str)) - self.ignore
+        self.names = sorted(set(self.data['Channel Name'].astype(str)) - self.ignore)  # sorted: a set's order changes between runs
         self.displayMessage('Channels Found: {}'.format(self.names))
                     
         self.data['Xc'] /= self.units[self.unit]

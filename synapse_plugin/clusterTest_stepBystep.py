@@ -104,7 +104,7 @@ class ClusterAnalysis:
     			self.data[k] = self.data[k].astype(float)
     	print('Gathering channels...')
     	#g.m.statusBar().showMessage('Gathering channels...')        
-    	self.names = set(self.data['Channel Name'].astype(str)) - self.ignore
+    	self.names = sorted(set(self.data['Channel Name'].astype(str)) - self.ignore)  # sorted: a set's order changes between runs
     	print('Channels Found: %s' % ', '.join(self.names))
     	#g.m.statusBar().showMessage('Channels Found: %s' % ', '.join(self.names))
     
